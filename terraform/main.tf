@@ -55,11 +55,12 @@ resource "google_artifact_registry_repository" "n8n_repo" {
 
 # --- Cloud SQL --- #
 resource "google_sql_database_instance" "n8n_db_instance" {
-  name             = "${var.cloud_run_service_name}-db" # Use service name prefix for uniqueness
+  name             = var.db_instance_name
   project          = var.gcp_project_id
   region           = var.gcp_region
-  database_version = "POSTGRES_13"
+  database_version = "POSTGRES_17"
   settings {
+    edition           = "ENTERPRISE"
     tier              = var.db_tier
     availability_type = "ZONAL"  # Match guide
     disk_type         = "PD_HDD" # Match guide

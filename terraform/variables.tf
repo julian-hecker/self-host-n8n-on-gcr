@@ -10,6 +10,12 @@ variable "gcp_region" {
   default     = "us-west2" # Defaulting to your region
 }
 
+variable "db_instance_name" {
+  description = "Name for the Cloud SQL instance."
+  type        = string
+  default     = "n8n-instance"
+}
+
 variable "db_name" {
   description = "Name for the Cloud SQL database."
   type        = string
