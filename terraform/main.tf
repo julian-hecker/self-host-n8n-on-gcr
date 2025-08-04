@@ -309,8 +309,8 @@ resource "google_cloud_run_v2_service" "n8n" {
 
       startup_probe {
         initial_delay_seconds = 120 # Added from GitHub issue solution
-        timeout_seconds       = 240
-        period_seconds        = 10 # Reduced period for faster checks
+        timeout_seconds       = 30
+        period_seconds        = 60 # Must be greater than timeout
         failure_threshold     = 3  # Standard threshold
         tcp_socket {
           port = var.cloud_run_container_port
