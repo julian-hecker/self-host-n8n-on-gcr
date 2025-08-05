@@ -52,6 +52,11 @@ variable "db_storage_size" {
   default     = 10
 }
 
+variable "n8n_gcs_bucket" {
+  description = "Google Cloud Storage Bucket for n8n instance files"
+  type        = string
+}
+
 variable "artifact_repo_name" {
   description = "Name for the Artifact Registry repository."
   type        = string

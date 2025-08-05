@@ -171,11 +171,21 @@ resource "google_cloud_run_v2_service" "n8n" {
         instances = [google_sql_database_instance.n8n_db_instance.connection_name]
       }
     }
+    volumes {
+      name = "n8n-data"
+      gcs {
+        bucket = var.n8n_gcs_bucket
+      }
+    }
     containers {
       image = local.n8n_image_name # IMPORTANT: Build and push this image manually first
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"
+      }
+      volume_mounts {
+        name       = "n8n-data"
+        mount_path = "/home/node/.n8n"
       }
       ports {
         container_port = var.cloud_run_container_port
@@ -230,6 +240,10 @@ resource "google_cloud_run_v2_service" "n8n" {
       }
       env {
         name  = "GENERIC_TIMEZONE"
+        value = var.generic_timezone
+      }
+      env {
+        name  = "TZ"
         value = var.generic_timezone
       }
       env {
@@ -295,10 +309,6 @@ resource "google_cloud_run_v2_service" "n8n" {
         value = "60000"
       }
       env {
-        name  = "EXECUTIONS_PROCESS" # Added from GitHub issue solution
-        value = "main"
-      }
-      env {
         name  = "EXECUTIONS_MODE" # Added from GitHub issue solution
         value = "regular"
       }
@@ -340,4 +350,11 @@ resource "google_cloud_run_v2_service_iam_member" "n8n_public_invoker" {
   name     = google_cloud_run_v2_service.n8n.name
   role     = "roles/run.invoker"
   member   = "allUsers"
+}
+
+# Grants n8n access to see storage bucket
+resource "google_storage_bucket_iam_member" "n8n_bucket_access" {
+  bucket = var.n8n_gcs_bucket
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.n8n_sa.email}"
 }
